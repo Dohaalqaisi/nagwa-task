@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projectile motion</title>
+    <link rel="icon" type="image/x-icon" href="https://contents.nagwa.com/content/images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <style>
+        /* 
+            * styles are ordered as follow: 1) tags 2)classes 3)ids, all are ordered alphabetically
+            * properties are ordered alphabetically as well
+        */
+        :root {
+            --main-color: #232323;
+            --white: #FFF;
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--main-color);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        button {
+            border: 0;
+            border-radius: 25px;
+            color: var(--white);
+            cursor: pointer;
+            font-size: 18px;
+            height: 45px;
+            padding: 10px 15px;
+            margin: 0 15px;
+            min-width: 120px;
+            box-shadow: none;
+        }
+
+        button:hover {
+            box-shadow: 2px 4px 18px rgba(0, 0, 0, 0.4);
+        }
+
+        footer {
+            color: grey;
+            display: block;
+            font-size: 12px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            padding-top: 40px;
+        }
+
+        input:focus-visible {
+            outline: 0;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        main {
+            padding: 1rem;
+        }
+
+        p {
+            margin-bottom: 25px;
+        }
+
+        svg {
+            opacity: 0;
+            max-height: 100%;
+            max-width: 100%;
+        }
+
+        .btns-container {
+            margin: 30px 0;
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: 700;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .d-none {
+            display: none;
+        }
+
+        .inputs {
+            justify-content: center;
+        }
+
+        .input-container {
+            margin: 0 30px;
+            opacity: 0.5;
+        }
+
+        .input-container:focus-within {
+            opacity: 1;
+        }
+
+        .input-container input {
+            border: 0;
+            border-bottom: 1px solid var(--main-color);
+            display: inline-block;
+            height: 30px;
+            width: 100%;
+        }
+
+        .launch-btn {
+            background-color: #7ed321;
+        }
+
+        .projectile-container {
+            height: 500px;
+            background-color: #ebecec;
+            margin: auto;
+            max-width: 100%;
+            position: relative;
+            width: 1000px;
+        }
+
+        .reset-btn {
+            background-color: #F6745E;
+        }
+
+        .result {
+            background-color: #fbfbfb;
+            padding: 30px 20px;
+        }
+
+        .summary {
+            color: #026bb0;
+            font-size: 20px;
+            justify-content: space-around;
+            opacity: 0;
+        }
+
+        .summary.fadein,
+        svg.fadein {
+            animation: fadein 1s linear 0.25s forwards;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        @keyframes fadein {
+            0% {
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .d-flex {
+                flex-direction: column;
+            }
+
+            .projectile-container {
+                overflow: scroll;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1 class="title text-center ">Projectile Motion</h1>
+    </header>
+    <main>
+        <form id="projectile-form">
+            <p class="text-center">
+                Enter the initial velocity and the projection angle, and watch how the projectile will move
+            </p>
+            <div class="d-flex inputs">
+                <div class="input-container" tabindex="0">
+                    <label>
+                        Initial velocity <abbr title="meters per second">(m/s)</abbr>
+                    </label>
+                    <input id="init-velocity" type="number" min="0" max="100" placeholder="ex: 25" required>
+                </div>
+
+                <div class="input-container" tabindex="1">
+                    <label>
+                        Projectile angle <abbr title="degrees">°</abbr>
+                    </label>
+                    <input id="proj-angle" type="number" min="0" max="90" placeholder="ex: 45" required>
+                </div>
+            </div>
+            <div class="btns-container">
+                <button class="launch-btn" type="submit">Launch</button>
+                <button class="reset-btn" id="reset-btn" type="reset">Reset</button>
+            </div>
+        </form>
+        <section id="result" class="result">
+            <section id="summary" class="summary d-flex">
+                <p>
+                    <span>Distance in x-axis ≈</span>
+                    <span class="bold" id="x-dist">4m</span>
+
+                </p>
+                <p>
+                    <span>Distance in y-axis ≈</span>
+                    <span class="bold" id="y-dist">4m</span>
+                </p>
+            </section>
+            <div id="projectile-container" class="projectile-container">
+                <svg class="fadein" id="projectile-svg" viewBox="0 0 300 50" style="border: #a1a6a4 solid" width="100%"
+                    height="100%" xmlns="http://www.w3.org/2000/svg">
+                    <!-- grid lines -->
+                    <g>
+                        <!-- vertical lines of the grid -->
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M10 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M20 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M30 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M40 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M50 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M60 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M70 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M80 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M90 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M100 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M110 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M120 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M130 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M140 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M150 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M160 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M170 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M180 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M190 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M200 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M210 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M220 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M230 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M240 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M250 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M260 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M270 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M280 -50 V100" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M290 -50 V100" />
+
+                        <!-- horizontal lines of the grid -->
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M0 -50 H400" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M0 -40 H400" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M0 -30 H400" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M0 -20 H400" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M0 -10 H400" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M0 0 H400" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M0 10 H400" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M0 20 H400" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M0 30 H400" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M0 40 H400" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M0 50 H400" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M0 60 H400" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M0 70 H400" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M0 80 H400" />
+                        <path stroke="#a1a6a4" stroke-width="0.2" d="M0 90 H400" />
+                    </g>
+                </svg>
+            </div>
+        </section>
+        <footer>
+            <span class="bold">Results are obtained using these asspumtions</span> <br>
+            1) Acceleration due to gravity is equal to 9.8 m/s<sup>2</sup> </br>
+            2) The intial point of projection is at y = 0 </br>
+            3) The range of the projection angle is from 0 to 90° <br>
+            4) The velocity here ranges from 0 to 100 which is a real life average range <br>
+            5) Non linear scaling is used to fit all paths into the grid
+        </footer>
+    </main>
+
+    <!-- event listeners -->
+    <script>
+        // submit form event listener
+        document.getElementById('projectile-form').addEventListener('submit', () => {
+            event.preventDefault();
+            // scroll to view where the projectile container is placed in the page
+            const projectileContainer = document.getElementById('result');
+            projectileContainer.scrollIntoView({ behavior: "smooth" });
+
+            // get form values
+            const initialVelocity = document.getElementById('init-velocity').value;
+            const projectionAngle = document.getElementById('proj-angle').value;
+
+            calcXYDistances(initialVelocity, projectionAngle);
+        })
+
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            paths = document.querySelectorAll('.projectile-path');
+            balls = document.querySelectorAll('.projectile-ball');
+            paths.forEach(path => {
+                path.remove();
+            });
+            balls.forEach(ball => {
+                ball.remove();
+            })
+            document.getElementById('summary').classList.remove('fadein');
+        })
+    </script>
+    <script>
+        const g = -9.8; // assume gravity is approxiamtely = -9.8
+        function calcXYDistances(initialVelocity, projectionAngle) {
+            const pi = Math.PI;
+            // getting velocity component in y-axis ... vy = v * sin(angle)
+            const vyInit = initialVelocity * Math.sin(projectionAngle * (pi / 180));
+            const vyFinal = -vyInit;
+            const vAvg = vyFinal - vyInit;
+
+
+            // get time taken by th projectile to finish its path ... vAvg = a * t 
+            const time = vAvg / g;
+            console.log(time);
+            const vyMid = 0; // velocity of the projectile at the highest point
+
+            // yDist = VyInit^2  / (2 * g)
+            // added ..* 100) / 100 to approximate to the nearest hundredth
+            const yDist = Math.round(((Math.pow(vyMid, 2) - Math.pow(vyInit, 2)) / (2 * g)) * 100) / 100;
+
+            // getting velocity component in x-axis ... vx = v * cos(angle)
+            const vxInit = initialVelocity * Math.cos(projectionAngle * (pi / 180));
+            const xDist = Math.round(vxInit * time * 100) / 100; // vx is constant
+
+            displayResults(xDist, yDist);
+            drawProjectilePath(xDist, yDist, time, projectionAngle);
+        }
+
+        function displayResults(xDist, yDist) {
+            // displaying the resluts of distances
+            document.getElementById('x-dist').innerText = `${xDist}m`;
+            document.getElementById('y-dist').innerText = `${yDist}m`;
+            document.getElementById('summary').classList.add('fadein');
+        }
+
+        function drawProjectilePath(xDist, yDist, time, projectionAngle) {
+            /*
+                *  mid point of the projectile is (xDist/2, yDist) end point is (xDist , 0)
+            */
+            //reference used for <path>: https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths
+
+            // scaling distances using sqrt() (non-linear function)
+            xDist = 10 * Math.sqrt(xDist);
+            yDist = 10 * Math.sqrt(yDist);
+            
+            if (projectionAngle > 0) {
+                const path = `M 0,100 Q ${(xDist / 2)},-${yDist} ${xDist},100`;
+                let projectilePathSvg = `
+                    <g id="path">
+                        <path class="projectile-path" d="${path}" fill="none" stroke="#09c6a8" />
+                        <circle class="projectile-ball" cx="0" cy="0" r="2.5" fill="#026bb0">
+                            <animateMotion begin="2s" dur="${time}s" fill="freeze" repeatCount="indefinite" path="${path}"/>
+                        </circle>
+                    </g>
+                `;
+                const existingPath = document.getElementById('path');
+                const projectileSvg = document.getElementById('projectile-svg');
+                // to show only one path at a time
+                if (!existingPath) {
+                    projectileSvg.insertAdjacentHTML('beforeend', projectilePathSvg);
+                    return;
+                }
+                existingPath.remove();
+                projectileSvg.insertAdjacentHTML('beforeend', projectilePathSvg);
+            }
+        }
+    </script>
+</body>
+
+</html>
